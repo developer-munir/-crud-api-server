@@ -134,6 +134,30 @@ async function run() {
     res.send(insertAReact);
   });
 
+  // update react when toggle react button
+  app.put("/social/react/:id", async (req, res) => {
+    /* 
+        {
+                "reactType":"love"
+        }
+    */
+    const react = req.body;
+    const id = req.params.id;
+    const filter = { _id: ObjectId(id) };
+    const options = { upsert: true };
+    const updatedDoc = {
+      $set: {
+        reactType: react?.newReact,
+      },
+    };
+    const updateReact = await reactCollection.updateOne(
+      filter,
+      updatedDoc,
+      options
+    );
+    res.send(updateReact);
+  });
+
   // comment a post
   app.post("/social/comment", async (req, res) => {
     /* 
