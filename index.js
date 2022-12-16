@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -20,9 +20,55 @@ async function run() {
   const userCollection = client.db("crud-api").collection("userCollection");
   // post user
   app.post("/users", async (req, res) => {
+    /* 
+        {
+            "userName": "developer-munir",
+            "email": "devolopermunir@gmail.com",
+            "password": "password",
+        }
+     */
     const user = req.body;
-    const result = await userCollection.insertOne(user);
-    res.send(result);
+    const postUser = await userCollection.insertOne(user);
+    res.send(postUser);
+  });
+
+  // login user
+  app.get("/user", async (req, res) => {
+    /* 
+        {
+            "userName": "developer-munir",
+            "password": "password",
+        }
+     */
+    const loggedUser = req.body;
+    const query = {
+      userName: loggedUser?.userName,
+      password: loggedUser?.password,
+    };
+    const getUser = await userCollection.findOne(query);
+    res.send(getUser);
+  });
+
+  // update password
+  app.patch("/users/updatePassword", async (req, res) => {
+    /* 
+        {
+            "id": "639c87f394922c61dd3bbaba",
+            "newPassword": "passwordChanged",
+        }
+     */
+    const userInfo = req.body;
+    const filter = { _id: ObjectId(userInfo?.id) };
+    const updatedDoc = {
+      $set: {
+        password: userInfo?.newPassword,
+      },
+    };
+    const passwordUpdatedResult = await userCollection.updateOne(
+      filter,
+      updatedDoc
+    );
+    res.send(passwordUpdatedResult);
   });
 }
 run().catch((error) => console.log(error));
