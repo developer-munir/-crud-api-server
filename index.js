@@ -15,15 +15,16 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-/* 
-{
-  "userName": "developer-munir",
-  "email": "devolopermunir@gmail.com",
-  "password": "password",
-}
-*/
 
-async function run() {}
+async function run() {
+  const userCollection = client.db("crud-api").collection("userCollection");
+  // post user
+  app.post("/users", async (req, res) => {
+    const user = req.body;
+    const result = await userCollection.insertOne(user);
+    res.send(result);
+  });
+}
 run().catch((error) => console.log(error));
 
 app.get("/", (req, res) => {
