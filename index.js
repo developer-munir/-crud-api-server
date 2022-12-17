@@ -16,6 +16,11 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
+/* 
+api link ---- https://crud-api-server.vercel.app/
+
+*/
+
 async function run() {
   const userCollection = client.db("crud-api").collection("userCollection");
   const socialCollection = client.db("crud-api").collection("socialCollection");
