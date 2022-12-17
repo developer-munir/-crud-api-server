@@ -133,9 +133,15 @@ async function run() {
     const insertAReact = await reactCollection.insertOne(reacts);
     res.send(insertAReact);
   });
-
+  // get all react
+  app.get("/social/reacts/:id", async (req, res) => {
+    const id = req.params.id;
+    const query = { postId: id };
+    const getReacts = await reactCollection.find(query).toArray();
+    res.send(getReacts);
+  });
   // update react when toggle react button
-  app.put("/social/react/:id", async (req, res) => {
+  app.patch("/social/react/:id", async (req, res) => {
     /* 
         {
                 "reactType":"love"
@@ -144,20 +150,14 @@ async function run() {
     const react = req.body;
     const id = req.params.id;
     const filter = { _id: ObjectId(id) };
-    const options = { upsert: true };
     const updatedDoc = {
       $set: {
         reactType: react?.newReact,
       },
     };
-    const updateReact = await reactCollection.updateOne(
-      filter,
-      updatedDoc,
-      options
-    );
+    const updateReact = await reactCollection.updateOne(filter, updatedDoc);
     res.send(updateReact);
   });
-
   // comment a post
   app.post("/social/comment", async (req, res) => {
     /* 
@@ -166,13 +166,40 @@ async function run() {
                      "reactedPersonName": "Munir Hossain Juwel",
                      "reactedUserPhoto": "userPhoto here",
                      "userId": "639c87f394922c61dd3bbaba",
-                     "Comment-time":"10.00 P.M",
                      "comment":"comment-type here"
+                     "CommentTime":"10.00 P.M",
                 }
     */
     const comment = req.body;
     const insertAComment = await commentCollection.insertOne(comment);
     res.send(insertAComment);
+  });
+  // get all comments
+  app.get("/social/comments/:id", async (req, res) => {
+    const id = req.params.id;
+    const query = { postId: id };
+    const getComments = await commentCollection.find(query).toArray();
+    res.send(getComments);
+  });
+  // update a comment
+  app.patch("/social/comment/:id", async (req, res) => {
+    /* 
+        {
+                "newComment":"comment-type here",
+                "newCommentTime":"10.00 P.M"
+        }
+    */
+    const comment = req.body;
+    const id = req.params.id;
+    const filter = { _id: ObjectId(id) };
+    const updatedDoc = {
+      $set: {
+        comment: comment?.newComment,
+        CommentTime: comment?.newCommentTime,
+      },
+    };
+    const updateComment = await commentCollection.updateOne(filter, updatedDoc);
+    res.send(updateComment);
   });
 }
 run().catch((error) => console.log(error));
