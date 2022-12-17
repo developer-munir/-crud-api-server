@@ -23,7 +23,8 @@ async function run() {
   const commentCollection = client
     .db("crud-api")
     .collection("commentCollection");
-  // post user
+
+  // sing up user
   app.post("/users", async (req, res) => {
     /* 
         {
@@ -34,7 +35,7 @@ async function run() {
      */
     const user = req.body;
     const postUser = await userCollection.insertOne(user);
-    res.send(postUser);
+    res.status(200).send(postUser);
   });
 
   // login user
@@ -52,13 +53,16 @@ async function run() {
       password: loggedUser?.password,
     };
     const getUser = await userCollection.findOne(query);
-    res.send(getUser);
+    if (!getUser) {
+      console.log("invalid username password");
+    }
+    res.status(200).send(getUser);
   });
 
   // update password
   app.patch("/users/updatePassword", async (req, res) => {
     /*
-    when update password send backend user id must
+    when update password send backend logged user id must
         {
             "id": "639c87f394922c61dd3bbaba",
             "newPassword": "passwordChanged",
@@ -75,7 +79,7 @@ async function run() {
       filter,
       updatedDoc
     );
-    res.send(passwordUpdatedResult);
+    res.status(200).send(passwordUpdatedResult);
   });
 
   // for social media
@@ -93,14 +97,14 @@ async function run() {
 
     const postData = req.body;
     const insertAPost = await socialCollection.insertOne(postData);
-    res.send(insertAPost);
+    res.status(200).send(insertAPost);
   });
 
   // get all post
   app.get("/social", async (req, res) => {
     const query = {};
     const allPost = await socialCollection.find(query).toArray();
-    res.send(allPost);
+    res.status(200).send(allPost);
   });
 
   // get single person single post
@@ -108,14 +112,14 @@ async function run() {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const singlePersonSinglePost = await socialCollection.findOne(query);
-    res.send(singlePersonSinglePost);
+    res.status(200).send(singlePersonSinglePost);
   });
   // get single person all post
   app.get("/social/allPosts/:id", async (req, res) => {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const singlePersonAllPost = await socialCollection.find(query).toArray();
-    res.send(singlePersonAllPost);
+    res.status(200).send(singlePersonAllPost);
   });
 
   // update a post
@@ -136,7 +140,7 @@ async function run() {
       },
     };
     const updatePost = await socialCollection.updateOne(filter, updatedDoc);
-    res.send(updatePost);
+    res.status(200).send(updatePost);
   });
 
   // delete a post
@@ -144,7 +148,7 @@ async function run() {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const deletePost = await socialCollection.deleteOne(query);
-    res.send(deletePost);
+    res.status(200).send(deletePost);
   });
   // react a post
   app.post("/social/react", async (req, res) => {
@@ -159,14 +163,14 @@ async function run() {
     */
     const reacts = req.body;
     const insertAReact = await reactCollection.insertOne(reacts);
-    res.send(insertAReact);
+    res.status(200).send(insertAReact);
   });
   // get all react
   app.get("/social/reacts/:id", async (req, res) => {
     const id = req.params.id;
     const query = { postId: id };
     const getReacts = await reactCollection.find(query).toArray();
-    res.send(getReacts);
+    res.status(200).send(getReacts);
   });
   // update react when toggle react button
   app.patch("/social/react/:id", async (req, res) => {
@@ -184,7 +188,7 @@ async function run() {
       },
     };
     const updateReact = await reactCollection.updateOne(filter, updatedDoc);
-    res.send(updateReact);
+    res.status(200).send(updateReact);
   });
   // comment a post
   app.post("/social/comment", async (req, res) => {
@@ -200,14 +204,14 @@ async function run() {
     */
     const comment = req.body;
     const insertAComment = await commentCollection.insertOne(comment);
-    res.send(insertAComment);
+    res.status(200).send(insertAComment);
   });
   // get all comments
   app.get("/social/comments/:id", async (req, res) => {
     const id = req.params.id;
     const query = { postId: id };
     const getComments = await commentCollection.find(query).toArray();
-    res.send(getComments);
+    res.status(200).send(getComments);
   });
   // update a comment
   app.patch("/social/comment/:id", async (req, res) => {
@@ -227,7 +231,7 @@ async function run() {
       },
     };
     const updateComment = await commentCollection.updateOne(filter, updatedDoc);
-    res.send(updateComment);
+    res.status(200).send(updateComment);
   });
   // delete a comment
   app.delete("/social/comment/:id", async (req, res) => {
@@ -236,13 +240,13 @@ async function run() {
       _id: ObjectId(id),
     };
     const deleteComment = await commentCollection.deleteOne(query);
-    res.send(deleteComment);
+    res.status(200).send(deleteComment);
   });
 }
 run().catch((error) => console.log(error));
 
 app.get("/", (req, res) => {
-  res.send("crud-api-server is running");
+  res.status(200).send("crud-api-server is running");
 });
 app.listen(port, () => {
   console.log(`app is running on port ${port}`);
