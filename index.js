@@ -87,7 +87,7 @@ async function run() {
             "postedUserName": "developer-munir",
             "postedUserPhoto": "userPhoto here",
             "post": "post contents whatever you like",
-            "post-time":"10.00 P.M"
+            "postTime":"10.00 P.M"
         }
       */
 
@@ -118,6 +118,34 @@ async function run() {
     res.send(singlePersonAllPost);
   });
 
+  // update a post
+  app.patch("/social/:id", async (req, res) => {
+    /* 
+      {
+        "post": "post update",
+        "postTime":"12.00 P.M"
+      }
+    */
+    const id = req.params.id;
+    const newPost = req.body;
+    const filter = { _id: ObjectId(id) };
+    const updatedDoc = {
+      $set: {
+        post: newPost?.post,
+        postTime: newPost?.postTime,
+      },
+    };
+    const updatePost = await socialCollection.updateOne(filter, updatedDoc);
+    res.send(updatePost);
+  });
+
+  // delete a post
+  app.delete("/social/:id", async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const deletePost = await socialCollection.deleteOne(query);
+    res.send(deletePost);
+  });
   // react a post
   app.post("/social/react", async (req, res) => {
     /* 
@@ -200,6 +228,15 @@ async function run() {
     };
     const updateComment = await commentCollection.updateOne(filter, updatedDoc);
     res.send(updateComment);
+  });
+  // delete a comment
+  app.delete("/social/comment/:id", async (req, res) => {
+    const id = req.params.id;
+    const query = {
+      _id: ObjectId(id),
+    };
+    const deleteComment = await commentCollection.deleteOne(query);
+    res.send(deleteComment);
   });
 }
 run().catch((error) => console.log(error));
