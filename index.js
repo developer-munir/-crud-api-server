@@ -34,8 +34,20 @@ async function run() {
         }
      */
     const user = req.body;
-    const postUser = await userCollection.insertOne(user);
-    res.status(200).send(postUser);
+    const userName = {
+      userName: user?.userName,
+    };
+    const userEmail = {
+      email: user?.email,
+    };
+    const getUserName = await userCollection.findOne(userName);
+    const getUserEmail = await userCollection.findOne(userEmail);
+    if (!getUserName && !getUserEmail) {
+      const postUser = await userCollection.insertOne(user);
+      res.status(200).send(postUser);
+    } else {
+      res.status(404).send("user already exist");
+    }
   });
 
   // login user
